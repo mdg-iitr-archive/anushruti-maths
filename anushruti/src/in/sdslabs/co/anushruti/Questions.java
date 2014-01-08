@@ -9,6 +9,7 @@ import java.util.Random;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.View;
@@ -43,7 +44,7 @@ public class Questions extends Activity implements OnClickListener {
 	int x, y, z, left; // stores the values of the numbers generated
 	int etSelect[] = new int[2]; // selects the Edit Text whose value will be
 	Animation anim; // sets
-	View linearLayout;
+	View relativeLayout;
 	List<Map<String, String>> numbersList = new ArrayList<Map<String, String>>();
 	TextView txt;
 	TextView tvSign1, tvSign2;
@@ -56,14 +57,19 @@ public class Questions extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.questions);
-		linearLayout = (RelativeLayout) findViewById(R.id.rr);
-		Display display = getWindowManager().getDefaultDisplay();
-		scrWidth = display.getWidth();
-		scrHeight = display.getHeight();
+
+		getScreenParams();
 		initializeViews();
 		done.setOnClickListener(this);
 		generateQuestion();
 
+	}
+
+	private void getScreenParams() {
+		// TODO Auto-generated method stub
+		Display display = getWindowManager().getDefaultDisplay();
+		scrWidth = display.getWidth();
+		scrHeight = display.getHeight();
 	}
 
 	@SuppressLint("NewApi")
@@ -110,6 +116,7 @@ public class Questions extends Activity implements OnClickListener {
 
 	private void initializeViews() {
 		// TODO Auto-generated method stub
+		relativeLayout = (RelativeLayout) findViewById(R.id.rr);
 		tv[0] = (TextView) findViewById(R.id.Text1);
 		tv[1] = (TextView) findViewById(R.id.Text2);
 		tv[2] = (TextView) findViewById(R.id.Text3);
@@ -178,7 +185,7 @@ public class Questions extends Activity implements OnClickListener {
 		tvCreate[turn].setLayoutParams(new LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
-		((RelativeLayout) linearLayout).addView(tvCreate[turn]);
+		((RelativeLayout) relativeLayout).addView(tvCreate[turn]);
 
 		tvCreate[turn].setVisibility(View.VISIBLE);
 		cursor_x += tvCreate[turn].getTextSize();
@@ -209,13 +216,15 @@ public class Questions extends Activity implements OnClickListener {
 		if (v.getId() == R.id.submit) {
 
 			if (answer == z) {
-				Toast.makeText(this, "Correct", Toast.LENGTH_LONG).show();
-				generateQuestion();
+				animatedStartActivity("Correct");
+				// Toast.makeText(this, "Correct", Toast.LENGTH_LONG).show();
+				// generateQuestion();
 			}
 
 			else {
-				Toast.makeText(this, "Incorrect", Toast.LENGTH_LONG).show();
-				tv[left].setText("");
+				animatedStartActivity("Incorrect");
+				// Toast.makeText(this, "Incorrect", Toast.LENGTH_LONG).show();
+				// tv[left].setText("");
 			}
 
 		} else {
@@ -227,10 +236,44 @@ public class Questions extends Activity implements OnClickListener {
 						gridItems_Y[answer / 10]);
 				startDeleteTextAnimation(answer / 10);
 				answer = answer % 10;
-				if(!(turn <= 0))
+				if (!(turn <= 0))
 					turn--;
 			}
 		}
+	}
+
+	@Override
+	protected void onResume() {
+		// animateIn this activity
+		ActivitySwitcher.animationIn(findViewById(R.id.rr), getWindowManager());
+
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	private void animatedStartActivity(String result) {
+		// we only animateOut this activity here.
+		// The new activity will animateIn from its onResume() - be sure to
+		// implement it.
+		final Intent intent = new Intent(getApplicationContext(), Result.class);
+		// disable default animation for new intent
+		Bundle setResult = new Bundle();
+		setResult.putString("result", result);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		intent.putExtras(setResult);
+		ActivitySwitcher.animationOut(findViewById(R.id.rr),
+				getWindowManager(),
+				new ActivitySwitcher.AnimationFinishedListener() {
+					@Override
+					public void onAnimationFinished() {
+						startActivity(intent);
+					}
+				});
 	}
 
 	private void startDeleteTextAnimation(int i) {
@@ -258,7 +301,7 @@ public class Questions extends Activity implements OnClickListener {
 		txt.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
 				LayoutParams.WRAP_CONTENT));
 
-		((RelativeLayout) linearLayout).addView(txt);
+		((RelativeLayout) relativeLayout).addView(txt);
 
 		txt.setVisibility(View.VISIBLE);
 		cursor_x += txt.getTextSize();
