@@ -34,27 +34,26 @@ import android.widget.LinearLayout.LayoutParams;
 
 public class Questions extends Activity implements OnClickListener {
 
-	// EditText[] et = new EditText[3];
-	int TEXT_SIZE=30;
-	int Place = 0;// next insert animation
+	int TEXT_SIZE = 30;
+	int Place = 0;// for doing next insert animation,eg 67 place_0--6  place_1--7
 	float cursor_x, cursor_y;
 	int answer = -1;
 	int digits = 2;
 	int turn = 0;
 	TextView[] tv = new TextView[3];
 	int[] txtViewId = new int[2];
-	float[] tvCursor_x = new float[2];
+	float[] tvCursor_x = new float[2];//save cursor position for a text view
 	TextView[] tvCreate = new TextView[2];
 	Button done;
 	GridView gridView;
 	int x, y, z, left; // stores the values of the numbers generated
 	int etSelect[] = new int[2]; // selects the Edit Text whose value will be
-	Animation anim; 
+	Animation anim;
 	View relativeLayout;
 	List<Map<String, String>> numbersList = new ArrayList<Map<String, String>>();
 	TextView txt;
-	TextView tvSign1, tvSign2;
-	float gridItems_X[] = new float[10];
+	TextView tvSign1, tvSign2;// for signs "+","="
+	float gridItems_X[] = new float[10];//save position of the integers(0 to 9) in grid view
 	float gridItems_Y[] = new float[10];
 	float scrWidth;
 	float scrHeight;
@@ -65,13 +64,13 @@ public class Questions extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.questions);
 		relativeLayout = (RelativeLayout) findViewById(R.id.rr);
-		Display display = getWindowManager().getDefaultDisplay();
 		getScreenParams();
 		initializeViews();
 		done.setOnClickListener(this);
 		generateQuestion();
 
 	}
+
 	private void getScreenParams() {
 		// TODO Auto-generated method stub
 		Display display = getWindowManager().getDefaultDisplay();
@@ -107,6 +106,7 @@ public class Questions extends Activity implements OnClickListener {
 		}
 		tv[etSelect[0]].setText(x + "");
 		tv[etSelect[1]].setText(y + "");
+		//placing of text view (similar to weights)2 1 2 1 2
 		// for textview 1
 		cursor_x = 0;
 		cursor_y = 0;
@@ -131,14 +131,14 @@ public class Questions extends Activity implements OnClickListener {
 		tv[2] = (TextView) findViewById(R.id.Text3);
 		tvSign1 = (TextView) findViewById(R.id.textView2);
 		tvSign2 = (TextView) findViewById(R.id.textView3);
-
 		done = (Button) findViewById(R.id.submit);
 		gridView = (GridView) findViewById(R.id.gridView);
+		
 		for (int i = 0; i <= 9; i++)
 			numbersList.add(createEntry("number", "" + i));
 		gridView.setAdapter(new SimpleAdapter(this, numbersList,
 				android.R.layout.simple_list_item_1, new String[] { "number" },
-				new int[] { android.R.id.text1 }));
+		new int[] { android.R.id.text1 }));
 		setListenerGV();
 	}
 
@@ -183,35 +183,23 @@ public class Questions extends Activity implements OnClickListener {
 
 			@Override
 			public void onAnimationEnd(Animation arg0) {
-				// Toast.makeText(Questions.this, "" + answer,
-				// Toast.LENGTH_LONG)
-				// .show();
-				// tvCreate[Place-1].setClickable(true);
 			}
 		});
 		tvCreate[Place] = new TextView(this);
 		tvCreate[Place].setOnClickListener(this);
-		// txtViewId[turn] = tvCreate[turn].getId();
-		tvCreate[Place].setId(44 + Place);
+		tvCreate[Place].setId(44 + Place);// setting ids to 44(for 1st textView),45 for other
 		tvCursor_x[Place] = cursor_x;
-
 		tvCreate[Place].setText(position + "");
-		int j=44+Place;
 		tvCreate[Place].setTextSize(TEXT_SIZE);
-		/*Toast.makeText(Questions.this, "id inserted: " + j,
-				Toast.LENGTH_LONG).show();*/
 		tvCreate[Place].setLayoutParams(new LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		tvCreate[Place].setClickable(true);
-		// tvCreate[Place].setFocusableInTouchMode(false);
 		((RelativeLayout) relativeLayout).addView(tvCreate[Place]);
-		// tvCreate[Place].setWidth(50);
 		tvCreate[Place].setVisibility(View.VISIBLE);
-		//cursor_x += tvCreate[Place].getTextSize();
 		cursor_x += TEXT_SIZE;
-		// anim.setAnimationListener((AnimationListener) this);
 		tvCreate[Place].startAnimation(anim);
 		Place++;
+		
 	}
 
 	private void animate(float lx, float ly, float lcursor_x, float lcursor_y) {
@@ -238,22 +226,14 @@ public class Questions extends Activity implements OnClickListener {
 
 			if (answer == z) {
 				animatedStartActivity("Correct");
-				//Toast.makeText(this, "Correct", Toast.LENGTH_LONG).show();
-				//generateQuestion();
 			}
 
 			else {
 				animatedStartActivity("Incorrect");
-				//Toast.makeText(this, "Incorrect", Toast.LENGTH_LONG).show();
-				//tv[left].setText("");
 			}
 
 		} else {
-			/*Toast.makeText(Questions.this, "id clicked  " + v.getId(),
-					Toast.LENGTH_LONG).show();
-			Toast.makeText(Questions.this, "  tvCreate[0]=" +tvCreate[0].getId()+"\n tvCreate[1]="+tvCreate[1].getId(),
-					Toast.LENGTH_LONG).show();*/
-			
+
 			int id_num;
 			float del_x;
 			int digit;
@@ -261,60 +241,30 @@ public class Questions extends Activity implements OnClickListener {
 			int idDeleted = v.getId();
 			if (idDeleted == 44) {
 				id_num = 0;
-				/*Toast.makeText(Questions.this, "id deleted: " + idDeleted,
-						Toast.LENGTH_LONG).show();*/
 				del_x = tvCursor_x[id_num];
-				if (answer / 10 == 0)// single digit like 5_
-				{
+				
 					((ViewGroup) relativeLayout).removeView(v);
 					animate(del_x, del_y, gridItems_X[answer],
 							gridItems_Y[answer]);
-					/*new Handler().postDelayed(new Runnable() {
-					    public void run() {
-					        v.clearAnimation();
-					        //Extra work goes here
-					        txt.setVisibility(View.GONE);
-					    }
-					}, anim.getDuration());*/
 					startDeleteTextAnimation(answer);
-					 
-					// cursor repositioning ... no text shift required
-					/*txt = new TextView(this);
-					txt.setText(answer + "");*/
 					cursor_x -= TEXT_SIZE;
-
 					answer = -1;
-					Place = 0;
-				}
+					Place = 0;//next insertion at place 0
+				
 
 			} else if (idDeleted == 45) {
 				id_num = 1;
 				del_x = tvCursor_x[id_num];
-				/*Toast.makeText(Questions.this, "id deleted: " + idDeleted,
-						Toast.LENGTH_LONG).show();*/
-				/*
-				 * if(answer/10==0)// single digit like _6 { animate(del_x,
-				 * del_y, gridItems_X[answer], gridItems_Y[answer]);
-				 * startDeleteTextAnimation(answer); answer = -1; } else//two
-				 * digit eg 54
-				 */
-					cursor_x -= TEXT_SIZE;
-					
-					((ViewGroup) relativeLayout).removeView(v);
-					animate(del_x, del_y, gridItems_X[answer % 10],
-							gridItems_Y[answer % 10]);
-					/*new Handler().postDelayed(new Runnable() {
-					    public void run() {
-					        v.clearAnimation();
-					        //Extra work goes here
-					        txt.setVisibility(View.GONE);
-					    }
-					}, anim.getDuration());*/
-					
-					startDeleteTextAnimation(answer % 10);
-					answer /= 10;
-					Place = 0;
-				
+				cursor_x -= TEXT_SIZE;
+
+				((ViewGroup) relativeLayout).removeView(v);
+				animate(del_x, del_y, gridItems_X[answer % 10],
+						gridItems_Y[answer % 10]);
+
+				startDeleteTextAnimation(answer % 10);
+				answer /= 10;
+				Place = 1;
+
 			}
 			if (!(turn <= 0))
 				turn--;
@@ -356,7 +306,6 @@ public class Questions extends Activity implements OnClickListener {
 				});
 	}
 
-
 	private void startDeleteTextAnimation(int i) {
 
 		// TODO Auto-generated method stub
@@ -374,30 +323,18 @@ public class Questions extends Activity implements OnClickListener {
 			public void onAnimationEnd(Animation arg0) {
 				txt.clearAnimation();
 				txt.setVisibility(View.GONE);
-				
+
 			}
 		});
-		//myTextView txt;
 		txt = new TextView(Questions.this);
 		txt.setOnClickListener(Questions.this);
-
 		txt.setText(i + "");
 		txt.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
 				LayoutParams.WRAP_CONTENT));
-
 		((RelativeLayout) relativeLayout).addView(txt);
-
 		txt.setVisibility(View.VISIBLE);
-
-		
-		// cursor_x -= txt.getTextSize();
-		// anim.setAnimationListener((AnimationListener) this);
 		txt.startAnimation(anim);
 
-		
-	
-		
-		
 	}
 
 }
