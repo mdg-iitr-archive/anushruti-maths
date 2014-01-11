@@ -9,51 +9,52 @@ import java.util.Random;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout.LayoutParams;
 
 public class Questions extends Activity implements OnClickListener {
 
 	int TEXT_SIZE = 30;
-	int Place = 0;// for doing next insert animation,eg 67 place_0--6  place_1--7
+	boolean isCorrect;
+	int Place = 0;// for doing next insert animation,eg 67 place_0--6 place_1--7
 	float cursor_x, cursor_y;
 	int answer = -1;
 	int digits = 2;
 	int turn = 0;
 	TextView[] tv = new TextView[3];
 	int[] txtViewId = new int[2];
-	float[] tvCursor_x = new float[2];//save cursor position for a text view
+	float[] tvCursor_x = new float[2];// save cursor position for a text view
 	TextView[] tvCreate = new TextView[2];
 	Button done;
 	GridView gridView;
 	int x, y, z, left; // stores the values of the numbers generated
+	int xSaved, ySaved, zSaved;
+	int posSaved[] = new int[2];
+	int leftSaved;
 	int etSelect[] = new int[2]; // selects the Edit Text whose value will be
 	Animation anim;
 	View relativeLayout;
 	List<Map<String, String>> numbersList = new ArrayList<Map<String, String>>();
 	TextView txt;
 	TextView tvSign1, tvSign2;// for signs "+","="
-	float gridItems_X[] = new float[10];//save position of the integers(0 to 9) in grid view
+	float gridItems_X[] = new float[10];// save position of the integers(0 to 9)
+										// in grid view
 	float gridItems_Y[] = new float[10];
 	float scrWidth;
 	float scrHeight;
@@ -67,8 +68,46 @@ public class Questions extends Activity implements OnClickListener {
 		getScreenParams();
 		initializeViews();
 		done.setOnClickListener(this);
-		generateQuestion();
+		try {
+			Bundle getBundle = getIntent().getExtras();
+			String res = getBundle.getString("res");
+			x = getBundle.getInt("x");
+			y = getBundle.getInt("y");
+			z = getBundle.getInt("z");
+			left = getBundle.getInt("left");
+			etSelect[0] = (left + 1) % 3;
+			etSelect[1] = (left + 2) % 3;
+			Arrays.sort(etSelect);
 
+			if (res.contentEquals("Correct"))
+				generateQuestion();
+			else {
+				tv[etSelect[0]].setText(x + "");
+				tv[etSelect[1]].setText(y + "");
+				tv[0].setTextSize(TEXT_SIZE);
+				tv[1].setTextSize(TEXT_SIZE);
+				tv[2].setTextSize(TEXT_SIZE);
+				// placing of text view (similar to weights)2 1 2 1 2
+				// for textview 1
+				cursor_x = 0;
+				cursor_y = 0;
+				// for 2nd
+				if (3 - etSelect[0] - etSelect[1] == 1) {
+					cursor_x = scrWidth * 3;
+					cursor_x /= 8;
+				}
+				if (3 - etSelect[0] - etSelect[1] == 2) {
+					cursor_x = scrWidth * 6;
+					cursor_x /= 8;
+				}
+				z = y + x;
+				if (etSelect[1] == 2)
+					z = y - x;
+			}
+		} catch (Exception e) {
+			generateQuestion();
+		}
+		Log.e("order", "Create called");
 	}
 
 	private void getScreenParams() {
@@ -106,7 +145,7 @@ public class Questions extends Activity implements OnClickListener {
 		}
 		tv[etSelect[0]].setText(x + "");
 		tv[etSelect[1]].setText(y + "");
-		//placing of text view (similar to weights)2 1 2 1 2
+		// placing of text view (similar to weights)2 1 2 1 2
 		// for textview 1
 		cursor_x = 0;
 		cursor_y = 0;
@@ -133,12 +172,12 @@ public class Questions extends Activity implements OnClickListener {
 		tvSign2 = (TextView) findViewById(R.id.textView3);
 		done = (Button) findViewById(R.id.submit);
 		gridView = (GridView) findViewById(R.id.gridView);
-		
+
 		for (int i = 0; i <= 9; i++)
 			numbersList.add(createEntry("number", "" + i));
 		gridView.setAdapter(new SimpleAdapter(this, numbersList,
 				android.R.layout.simple_list_item_1, new String[] { "number" },
-		new int[] { android.R.id.text1 }));
+				new int[] { android.R.id.text1 }));
 		setListenerGV();
 	}
 
@@ -187,7 +226,8 @@ public class Questions extends Activity implements OnClickListener {
 		});
 		tvCreate[Place] = new TextView(this);
 		tvCreate[Place].setOnClickListener(this);
-		tvCreate[Place].setId(44 + Place);// setting ids to 44(for 1st textView),45 for other
+		tvCreate[Place].setId(44 + Place);// setting ids to 44(for 1st
+											// textView),45 for other
 		tvCursor_x[Place] = cursor_x;
 		tvCreate[Place].setText(position + "");
 		tvCreate[Place].setTextSize(TEXT_SIZE);
@@ -199,7 +239,7 @@ public class Questions extends Activity implements OnClickListener {
 		cursor_x += TEXT_SIZE;
 		tvCreate[Place].startAnimation(anim);
 		Place++;
-		
+
 	}
 
 	private void animate(float lx, float ly, float lcursor_x, float lcursor_y) {
@@ -242,15 +282,13 @@ public class Questions extends Activity implements OnClickListener {
 			if (idDeleted == 44) {
 				id_num = 0;
 				del_x = tvCursor_x[id_num];
-				
-					((ViewGroup) relativeLayout).removeView(v);
-					animate(del_x, del_y, gridItems_X[answer],
-							gridItems_Y[answer]);
-					startDeleteTextAnimation(answer);
-					cursor_x -= TEXT_SIZE;
-					answer = -1;
-					Place = 0;//next insertion at place 0
-				
+
+				((ViewGroup) relativeLayout).removeView(v);
+				animate(del_x, del_y, gridItems_X[answer], gridItems_Y[answer]);
+				startDeleteTextAnimation(answer);
+				cursor_x -= TEXT_SIZE;
+				answer = -1;
+				Place = 0;// next insertion at place 0
 
 			} else if (idDeleted == 45) {
 				id_num = 1;
@@ -276,14 +314,7 @@ public class Questions extends Activity implements OnClickListener {
 	protected void onResume() {
 		// animateIn this activity
 		ActivitySwitcher.animationIn(findViewById(R.id.rr), getWindowManager());
-
 		super.onResume();
-	}
-
-	@Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
 	}
 
 	private void animatedStartActivity(String result) {
@@ -294,6 +325,10 @@ public class Questions extends Activity implements OnClickListener {
 		// disable default animation for new intent
 		Bundle setResult = new Bundle();
 		setResult.putString("result", result);
+		setResult.putInt("x", x);
+		setResult.putInt("y", y);
+		setResult.putInt("z", z);
+		setResult.putInt("left", left);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		intent.putExtras(setResult);
 		ActivitySwitcher.animationOut(findViewById(R.id.rr),

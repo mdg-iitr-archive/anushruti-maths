@@ -7,14 +7,19 @@ import android.view.View;
 import android.widget.Button;
 
 public class Result extends Activity {
-	
+
 	String res;
+	int x,y,z,left;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		Bundle getResult = getIntent().getExtras();
 		res = getResult.getString("result");
+		x = getResult.getInt("x");
+		y = getResult.getInt("y");
+		z = getResult.getInt("z");
+		left = getResult.getInt("left");
 		setContentView(R.layout.result);
 
 		Button switchActivityBtn = (Button) findViewById(R.id.bSwitchActivity);
@@ -43,9 +48,14 @@ public class Result extends Activity {
 				Questions.class);
 		// disable default animation for new intent
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-		Bundle setContent = new Bundle();
-		setContent.putString("result", res);
-		intent.putExtras(setContent);
+		Bundle setRes = new Bundle();
+		setRes.putString("res", res);
+		setRes.putInt("x", x);
+		setRes.putInt("y", y);
+		setRes.putInt("z", z);
+		setRes.putInt("left", left);
+		intent.putExtras(setRes);
+		
 		ActivitySwitcher.animationOut(findViewById(R.id.container),
 				getWindowManager(),
 				new ActivitySwitcher.AnimationFinishedListener() {
