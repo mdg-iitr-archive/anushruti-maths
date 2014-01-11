@@ -10,6 +10,7 @@ import java.util.Random;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Display;
@@ -49,7 +50,7 @@ public class Questions extends Activity implements OnClickListener {
 	int x, y, z, left; // stores the values of the numbers generated
 	int etSelect[] = new int[2]; // selects the Edit Text whose value will be
 	Animation anim; 
-	View linearLayout;
+	View relativeLayout;
 	List<Map<String, String>> numbersList = new ArrayList<Map<String, String>>();
 	TextView txt;
 	TextView tvSign1, tvSign2;
@@ -63,14 +64,19 @@ public class Questions extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.questions);
-		linearLayout = (RelativeLayout) findViewById(R.id.rr);
+		relativeLayout = (RelativeLayout) findViewById(R.id.rr);
 		Display display = getWindowManager().getDefaultDisplay();
-		scrWidth = display.getWidth();
-		// scrHeight = display.getHeight();
+		getScreenParams();
 		initializeViews();
 		done.setOnClickListener(this);
 		generateQuestion();
 
+	}
+	private void getScreenParams() {
+		// TODO Auto-generated method stub
+		Display display = getWindowManager().getDefaultDisplay();
+		scrWidth = display.getWidth();
+		scrHeight = display.getHeight();
 	}
 
 	@SuppressLint("NewApi")
@@ -198,7 +204,7 @@ public class Questions extends Activity implements OnClickListener {
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		tvCreate[Place].setClickable(true);
 		// tvCreate[Place].setFocusableInTouchMode(false);
-		((RelativeLayout) linearLayout).addView(tvCreate[Place]);
+		((RelativeLayout) relativeLayout).addView(tvCreate[Place]);
 		// tvCreate[Place].setWidth(50);
 		tvCreate[Place].setVisibility(View.VISIBLE);
 		//cursor_x += tvCreate[Place].getTextSize();
@@ -231,13 +237,15 @@ public class Questions extends Activity implements OnClickListener {
 		if (v.getId() == R.id.submit) {
 
 			if (answer == z) {
-				Toast.makeText(this, "Correct", Toast.LENGTH_LONG).show();
-				generateQuestion();
+				animatedStartActivity("Correct");
+				//Toast.makeText(this, "Correct", Toast.LENGTH_LONG).show();
+				//generateQuestion();
 			}
 
 			else {
-				Toast.makeText(this, "Incorrect", Toast.LENGTH_LONG).show();
-				tv[left].setText("");
+				animatedStartActivity("Incorrect");
+				//Toast.makeText(this, "Incorrect", Toast.LENGTH_LONG).show();
+				//tv[left].setText("");
 			}
 
 		} else {
@@ -258,7 +266,7 @@ public class Questions extends Activity implements OnClickListener {
 				del_x = tvCursor_x[id_num];
 				if (answer / 10 == 0)// single digit like 5_
 				{
-					((ViewGroup) linearLayout).removeView(v);
+					((ViewGroup) relativeLayout).removeView(v);
 					animate(del_x, del_y, gridItems_X[answer],
 							gridItems_Y[answer]);
 					/*new Handler().postDelayed(new Runnable() {
@@ -292,7 +300,7 @@ public class Questions extends Activity implements OnClickListener {
 				 */
 					cursor_x -= TEXT_SIZE;
 					
-					((ViewGroup) linearLayout).removeView(v);
+					((ViewGroup) relativeLayout).removeView(v);
 					animate(del_x, del_y, gridItems_X[answer % 10],
 							gridItems_Y[answer % 10]);
 					/*new Handler().postDelayed(new Runnable() {
@@ -314,25 +322,40 @@ public class Questions extends Activity implements OnClickListener {
 
 	}
 
+	@Override
+	protected void onResume() {
+		// animateIn this activity
+		ActivitySwitcher.animationIn(findViewById(R.id.rr), getWindowManager());
 
-	private class myTextView extends TextView{
-
-		
-		public myTextView(Context context) {
-			super(context);
-			// TODO Auto-generated constructor stub
-		}
-
-		
-		@Override
-		protected void onAnimationEnd() {
-			// TODO Auto-generated method stub
-			super.onAnimationEnd();
-			setVisibility(View.GONE);
-		}
-		
-		
+		super.onResume();
 	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	private void animatedStartActivity(String result) {
+		// we only animateOut this activity here.
+		// The new activity will animateIn from its onResume() - be sure to
+		// implement it.
+		final Intent intent = new Intent(getApplicationContext(), Result.class);
+		// disable default animation for new intent
+		Bundle setResult = new Bundle();
+		setResult.putString("result", result);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		intent.putExtras(setResult);
+		ActivitySwitcher.animationOut(findViewById(R.id.rr),
+				getWindowManager(),
+				new ActivitySwitcher.AnimationFinishedListener() {
+					@Override
+					public void onAnimationFinished() {
+						startActivity(intent);
+					}
+				});
+	}
+
 
 	private void startDeleteTextAnimation(int i) {
 
@@ -362,7 +385,7 @@ public class Questions extends Activity implements OnClickListener {
 		txt.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
 				LayoutParams.WRAP_CONTENT));
 
-		((RelativeLayout) linearLayout).addView(txt);
+		((RelativeLayout) relativeLayout).addView(txt);
 
 		txt.setVisibility(View.VISIBLE);
 
