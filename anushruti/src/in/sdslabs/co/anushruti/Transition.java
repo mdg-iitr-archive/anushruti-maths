@@ -67,7 +67,8 @@ public class Transition extends Activity implements OnClickListener{
 		});
 		txt= new TextView (Transition.this);
 		txt.setText(i+"");
-		 txt.setLayoutParams(new LayoutParams(
+		txt.setTextSize(70);
+		txt.setLayoutParams(new LayoutParams(
 		            LayoutParams.MATCH_PARENT,
 		            LayoutParams.WRAP_CONTENT));
 
