@@ -10,6 +10,7 @@ import java.util.Random;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -68,6 +69,7 @@ public class Questions extends Activity implements OnClickListener {
 		getScreenParams();
 		initializeViews();
 		done.setOnClickListener(this);
+
 		try {
 			Bundle getBundle = getIntent().getExtras();
 			String res = getBundle.getString("res");
@@ -170,10 +172,26 @@ public class Questions extends Activity implements OnClickListener {
 	}
 
 	@Override
-	protected void onStop() {
+	protected void onRestart() {
 		// TODO Auto-generated method stub
 		finish();
-		super.onStop();
+		super.onRestart();
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		outState.putInt("x", x);
+		outState.putInt("y", y);
+		outState.putInt("left", left);
+		outState.putString("res", "Incorrect");
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onRestoreInstanceState(savedInstanceState);
 	}
 
 	private void initializeViews() {
