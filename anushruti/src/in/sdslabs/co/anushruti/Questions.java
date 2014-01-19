@@ -163,6 +163,13 @@ public class Questions extends Activity implements OnClickListener {
 			z = y - x;
 	}
 
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		finish();
+		super.onStop();
+	}
+
 	private void initializeViews() {
 		// TODO Auto-generated method stub
 		tv[0] = (TextView) findViewById(R.id.Text1);

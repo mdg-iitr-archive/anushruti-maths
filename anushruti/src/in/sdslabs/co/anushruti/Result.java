@@ -9,7 +9,8 @@ import android.widget.Button;
 public class Result extends Activity {
 
 	String res;
-	int x,y,z,left;
+	int x, y, z, left;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -30,6 +31,13 @@ public class Result extends Activity {
 				animatedStartActivity();
 			}
 		});
+	}
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		finish();
+		super.onStop();
 	}
 
 	@Override
@@ -55,7 +63,7 @@ public class Result extends Activity {
 		setRes.putInt("z", z);
 		setRes.putInt("left", left);
 		intent.putExtras(setRes);
-		
+
 		ActivitySwitcher.animationOut(findViewById(R.id.container),
 				getWindowManager(),
 				new ActivitySwitcher.AnimationFinishedListener() {
