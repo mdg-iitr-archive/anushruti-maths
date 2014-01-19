@@ -143,6 +143,14 @@ public class Questions extends Activity implements OnClickListener {
 			x = y;
 			y = z;
 		}
+
+		z = y + x;
+		if (etSelect[1] == 2)
+			z = y - x;
+		if (z > 99) {
+			y = a.nextInt(99 - x);
+			z = x + y;
+		}
 		tv[etSelect[0]].setText(x + "");
 		tv[etSelect[1]].setText(y + "");
 		// placing of text view (similar to weights)2 1 2 1 2
@@ -158,9 +166,7 @@ public class Questions extends Activity implements OnClickListener {
 			cursor_x = scrWidth * 6;
 			cursor_x /= 8;
 		}
-		z = y + x;
-		if (etSelect[1] == 2)
-			z = y - x;
+
 	}
 
 	@Override
