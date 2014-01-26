@@ -7,12 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.security.auth.PrivateCredentialPermission;
-
-
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -80,18 +75,18 @@ public class Questions extends FragmentActivity implements OnClickListener {
 				public Dialog onCreateDialog(Bundle savedInstanceState) 
 				{
 					AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-					if(correct_ans)
+					/*if(correct_ans)
 					{
 						builder.setMessage(" Cogratulations! correct answer ");
 						DialogInterface.OnClickListener listener=new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 						//start new ques
-								FragmentActivity activity=getActivity();
-				//				activity.animatedStartActivity("Correct");
+								final Intent intent = new Intent(getActivity(), Result.class);
+								
 							}
 						};
 						builder.setPositiveButton("Next Question",listener);
-					}
+					}*/
 					if(!correct_ans)
 						{		
 						if(trial<3)
@@ -104,7 +99,7 @@ public class Questions extends FragmentActivity implements OnClickListener {
 							};
 							builder.setPositiveButton("Retry",listener);
 						}
-						if(trial==3)
+						/*if(trial==3)
 						{
 							builder.setMessage(" Sorry u got it wrong \n correct answer is "+z);
 							DialogInterface.OnClickListener listener=new DialogInterface.OnClickListener() {
@@ -113,7 +108,7 @@ public class Questions extends FragmentActivity implements OnClickListener {
 								}
 							};
 							builder.setPositiveButton("Do Next",listener);
-						}
+						}*/
 					}
 					return builder.create();
 					
@@ -129,8 +124,8 @@ public class Questions extends FragmentActivity implements OnClickListener {
 		initializeViews();
 		done.setOnClickListener(this);
 
-		try {
-			Bundle getBundle = getIntent().getExtras();
+		/*try {*/
+			/*Bundle getBundle = getIntent().getExtras();
 			String res = getBundle.getString("res");
 			x = getBundle.getInt("x");
 			y = getBundle.getInt("y");
@@ -138,11 +133,11 @@ public class Questions extends FragmentActivity implements OnClickListener {
 			left = getBundle.getInt("left");
 			etSelect[0] = (left + 1) % 3;
 			etSelect[1] = (left + 2) % 3;
-			Arrays.sort(etSelect);
+			Arrays.sort(etSelect);*/
 
-			if (res.contentEquals("Correct"))
+			/*if (res.contentEquals("Correct"))*/
 				generateQuestion();
-			else {
+			/*else {
 				tv[etSelect[0]].setText(x + "");
 				tv[etSelect[1]].setText(y + "");
 				tv[0].setTextSize(TEXT_SIZE);
@@ -167,7 +162,7 @@ public class Questions extends FragmentActivity implements OnClickListener {
 			}
 		} catch (Exception e) {
 			generateQuestion();
-		}
+		}*/
 		Log.e("order", "Create called");
 		
 	}
@@ -242,10 +237,10 @@ public class Questions extends FragmentActivity implements OnClickListener {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		// TODO Auto-generated method stub
-		outState.putInt("x", x);
+		/*outState.putInt("x", x);
 		outState.putInt("y", y);
 		outState.putInt("left", left);
-		outState.putString("res", "Incorrect");
+		outState.putString("res", "Incorrect");*/
 		super.onSaveInstanceState(outState);
 	}
 
@@ -357,19 +352,25 @@ public class Questions extends FragmentActivity implements OnClickListener {
 		if (v.getId() == R.id.submit) {
 
 			if (answer == z) {
-				correct_ans=true;
+				
+				animatedStartActivity("Correct");
+				/*correct_ans=true;
 				DialogFragment newFragment = new FireMissilesDialogFragment();
 				newFragment.show(getSupportFragmentManager(),
-						"missiles");
+						"missiles");*/
 				
 			}
 
 			else {
 				trial++;
+				if(trial<3)
+				{
 				DialogFragment newFragment = new FireMissilesDialogFragment();
 				newFragment.show(getSupportFragmentManager(),
 						"missiles");
-				//animatedStartActivity("Incorrect");
+				}
+				if(trial==3)
+					animatedStartActivity("Incorrect");
 			}
 
 		} else {
@@ -425,10 +426,10 @@ public class Questions extends FragmentActivity implements OnClickListener {
 		// disable default animation for new intent
 		Bundle setResult = new Bundle();
 		setResult.putString("result", result);
-		setResult.putInt("x", x);
+		/*setResult.putInt("x", x);
 		setResult.putInt("y", y);
 		setResult.putInt("z", z);
-		setResult.putInt("left", left);
+		setResult.putInt("left", left);*/
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		intent.putExtras(setResult);
 		ActivitySwitcher.animationOut(findViewById(R.id.rr),

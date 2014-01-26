@@ -17,14 +17,14 @@ public class Result extends Activity {
 
 		Bundle getResult = getIntent().getExtras();
 		res = getResult.getString("result");
-		x = getResult.getInt("x");
+		/*x = getResult.getInt("x");
 		y = getResult.getInt("y");
 		z = getResult.getInt("z");
-		left = getResult.getInt("left");
+		left = getResult.getInt("left");*/
 		setContentView(R.layout.result);
 
 		Button switchActivityBtn = (Button) findViewById(R.id.bSwitchActivity);
-		switchActivityBtn.setText(res);
+		switchActivityBtn.setText("Next Question");
 		switchActivityBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -56,13 +56,13 @@ public class Result extends Activity {
 				Questions.class);
 		// disable default animation for new intent
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-		Bundle setRes = new Bundle();
+		/*Bundle setRes = new Bundle();
 		setRes.putString("res", res);
 		setRes.putInt("x", x);
 		setRes.putInt("y", y);
 		setRes.putInt("z", z);
 		setRes.putInt("left", left);
-		intent.putExtras(setRes);
+		intent.putExtras(setRes);*/
 
 		ActivitySwitcher.animationOut(findViewById(R.id.container),
 				getWindowManager(),
