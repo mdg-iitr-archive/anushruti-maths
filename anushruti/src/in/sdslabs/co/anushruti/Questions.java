@@ -7,11 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javax.security.auth.PrivateCredentialPermission;
+
+
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -29,8 +37,11 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public class Questions extends Activity implements OnClickListener {
+public class Questions extends FragmentActivity implements OnClickListener {
 
+	static boolean correct_ans=false;
+	static int trial;//no of times the user attempts the ques
+	int ATTEMPTS=3;// max attempts allowed
 	int TEXT_SIZE = 30;
 	boolean isCorrect;
 	int Place = 0;// for doing next insert animation,eg 67 place_0--6 place_1--7
@@ -44,7 +55,9 @@ public class Questions extends Activity implements OnClickListener {
 	TextView[] tvCreate = new TextView[2];
 	Button done;
 	GridView gridView;
-	int x, y, z, left; // stores the values of the numbers generated
+	int x, y; // stores the values of the numbers generated
+	static int z;
+	int left;
 	int xSaved, ySaved, zSaved;
 	int posSaved[] = new int[2];
 	int leftSaved;
@@ -60,6 +73,52 @@ public class Questions extends Activity implements OnClickListener {
 	float scrWidth;
 	float scrHeight;
 	int place = -1;
+
+	//showing dialog box in case of incorrect answer
+		@SuppressLint("ValidFragment")
+		private static	class FireMissilesDialogFragment extends DialogFragment {
+				public Dialog onCreateDialog(Bundle savedInstanceState) 
+				{
+					AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+					if(correct_ans)
+					{
+						builder.setMessage(" Cogratulations! correct answer ");
+						DialogInterface.OnClickListener listener=new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+						//start new ques
+								FragmentActivity activity=getActivity();
+				//				activity.animatedStartActivity("Correct");
+							}
+						};
+						builder.setPositiveButton("Next Question",listener);
+					}
+					if(!correct_ans)
+						{		
+						if(trial<3)
+						{
+							builder.setMessage(" You missed it this time \n Wanna try again ");
+							DialogInterface.OnClickListener listener=new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									//remove the previous answer
+								}
+							};
+							builder.setPositiveButton("Retry",listener);
+						}
+						if(trial==3)
+						{
+							builder.setMessage(" Sorry u got it wrong \n correct answer is "+z);
+							DialogInterface.OnClickListener listener=new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									//new question
+								}
+							};
+							builder.setPositiveButton("Do Next",listener);
+						}
+					}
+					return builder.create();
+					
+				}
+			}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +169,7 @@ public class Questions extends Activity implements OnClickListener {
 			generateQuestion();
 		}
 		Log.e("order", "Create called");
+		
 	}
 
 	private void getScreenParams() {
@@ -123,6 +183,7 @@ public class Questions extends Activity implements OnClickListener {
 	private void generateQuestion() {
 		// TODO Auto-generated method stub
 
+		 trial=0;
 		tv[0].setText("");
 		tv[1].setText("");
 		tv[2].setText("");
@@ -296,11 +357,19 @@ public class Questions extends Activity implements OnClickListener {
 		if (v.getId() == R.id.submit) {
 
 			if (answer == z) {
-				animatedStartActivity("Correct");
+				correct_ans=true;
+				DialogFragment newFragment = new FireMissilesDialogFragment();
+				newFragment.show(getSupportFragmentManager(),
+						"missiles");
+				
 			}
 
 			else {
-				animatedStartActivity("Incorrect");
+				trial++;
+				DialogFragment newFragment = new FireMissilesDialogFragment();
+				newFragment.show(getSupportFragmentManager(),
+						"missiles");
+				//animatedStartActivity("Incorrect");
 			}
 
 		} else {
