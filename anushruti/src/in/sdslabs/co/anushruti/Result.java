@@ -53,7 +53,7 @@ public class Result extends Activity {
 		// The new activity will animateIn from its onResume() - be sure to
 		// implement it.
 		final Intent intent = new Intent(getApplicationContext(),
-				Questions.class);
+				TestScreen.class);
 		// disable default animation for new intent
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		/*Bundle setRes = new Bundle();

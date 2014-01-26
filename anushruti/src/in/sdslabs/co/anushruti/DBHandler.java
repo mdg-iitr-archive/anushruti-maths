@@ -47,8 +47,8 @@ public class DBHandler extends SQLiteOpenHelper{
 		SQLiteDatabase db = this.getWritableDatabase();
 		 
 	    ContentValues values = new ContentValues();
-	    values.put(QUES_NO, question.getQuesNo()); // Contact Name
-	    values.put(STATUS_QUES, question.getStatus()); // Contact Phone Number
+	    values.put(QUES_NO, question.getQuesNo()); 
+	    values.put(STATUS_QUES, question.getStatus());
 	 
 	    // Inserting Row
 	    db.insert(TABLE_CONTENTS, null, values);
@@ -68,12 +68,12 @@ public Question getQuestion(int ques_no) {
  
     Question question = new Question(Integer.parseInt(cursor.getString(0)),
     		Integer.parseInt(cursor.getString(1)));
-    // return contact
+    // return ques
     return question;
 }
 
-// Getting All Contacts
-public List<Question> getAllContacts() {
+// Getting All Questions
+public List<Question> getAllQuestions() {
 List<Question> questionList = new ArrayList<Question>();
 // Select All Query
 String selectQuery = "SELECT  * FROM " + TABLE_CONTENTS;
@@ -87,7 +87,7 @@ if (cursor.moveToFirst()) {
         Question question= new Question();
         question.setQuesNo(Integer.parseInt(cursor.getString(0)));
         question.setStatus(Integer.parseInt(cursor.getString(1)));
-        // Adding contact to list
+        // Adding ques to list
         questionList.add(question);
     } while (cursor.moveToNext());
 }
@@ -97,7 +97,7 @@ return questionList;
 }
 
 
-//Getting contacts Count
+//Getting questions Count
  public int getQuestionsCount() {
      String countQuery = "SELECT  * FROM " + TABLE_CONTENTS;
      SQLiteDatabase db = this.getReadableDatabase();
@@ -121,7 +121,7 @@ public int updateQuestion(Question question) {
 }
 
 // Deleting single question
-public void deleteContact(Question question) {
+public void deleteQuestion(Question question) {
 SQLiteDatabase db = this.getWritableDatabase();
 db.delete(TABLE_CONTENTS, QUES_NO + " = ?",
         new String[] { String.valueOf(question.getQuesNo()) });
