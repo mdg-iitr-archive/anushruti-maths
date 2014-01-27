@@ -29,7 +29,7 @@ public class DBHandler extends SQLiteOpenHelper{
 	public void onCreate(SQLiteDatabase db) {
 		// TODO Auto-generated method stub
 		String CREATE_LEVEL_TABLE="CREATE TABLE "+TABLE_CONTENTS+
-				"("+QUES_NO+" INTEGER PRIMARY KEY,"+STATUS_QUES+" INTEGER PRIMARY KEY"+")";
+				"("+QUES_NO+" INTEGER PRIMARY KEY,"+STATUS_QUES+" INTEGER"+")";
 		db.execSQL(CREATE_LEVEL_TABLE);
 	}
 
@@ -102,10 +102,11 @@ return questionList;
      String countQuery = "SELECT  * FROM " + TABLE_CONTENTS;
      SQLiteDatabase db = this.getReadableDatabase();
      Cursor cursor = db.rawQuery(countQuery, null);
+     int n=cursor.getCount();
      cursor.close();
 
      // return count
-     return cursor.getCount();
+     return n;
  }
  
  // Updating single question

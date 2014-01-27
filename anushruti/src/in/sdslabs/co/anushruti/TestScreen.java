@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 public class TestScreen extends FragmentActivity implements OnClickListener {
 
+	DBHandler db;
 	static boolean correct_ans=false;
 	static int trial;//no of times the user attempts the ques
 	int ATTEMPTS=3;// max attempts allowed
@@ -123,7 +124,7 @@ public class TestScreen extends FragmentActivity implements OnClickListener {
 		getScreenParams();
 		initializeViews();
 		done.setOnClickListener(this);
-
+		db = new DBHandler(this);
 		/*try {*/
 			/*Bundle getBundle = getIntent().getExtras();
 			String res = getBundle.getString("res");
@@ -353,6 +354,12 @@ public class TestScreen extends FragmentActivity implements OnClickListener {
 
 			if (answer == z) {
 				
+				int n=db.getQuestionsCount();
+				Question q= new Question();
+				q.setQuesNo(n+1);
+				q.setStatus(1);
+				db.addQues(q);
+				db.close();
 				animatedStartActivity("Correct");
 				/*correct_ans=true;
 				DialogFragment newFragment = new FireMissilesDialogFragment();
@@ -369,9 +376,18 @@ public class TestScreen extends FragmentActivity implements OnClickListener {
 				newFragment.show(getSupportFragmentManager(),
 						"missiles");
 				}
-				if(trial==3)
+					if(trial==3)
+				{
+					int n=db.getQuestionsCount();
+					Question q= new Question();
+					q.setQuesNo(n+1);
+					q.setStatus(2);
+					db.addQues(q);
+					db.close();
 					animatedStartActivity("Incorrect");
-			}
+				}
+				}
+					
 
 		} else {
 
