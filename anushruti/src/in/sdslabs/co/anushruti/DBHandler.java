@@ -128,4 +128,11 @@ db.delete(TABLE_CONTENTS, QUES_NO + " = ?",
         new String[] { String.valueOf(question.getQuesNo()) });
 db.close();
 }
+
+public void deleteDB()
+{
+	SQLiteDatabase db = this.getWritableDatabase();
+	db.delete(TABLE_CONTENTS,null,null);
+	db.close();
+	}
 }

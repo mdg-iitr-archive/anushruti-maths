@@ -38,7 +38,7 @@ public class TestScreen extends FragmentActivity implements OnClickListener {
 	static boolean correct_ans=false;
 	static int trial;//no of times the user attempts the ques
 	int ATTEMPTS=3;// max attempts allowed
-	int TEXT_SIZE = 30;
+	int TEXT_SIZE = 35;//********************************************************************
 	boolean isCorrect;
 	int Place = 0;// for doing next insert animation,eg 67 place_0--6 place_1--7
 	float cursor_x, cursor_y;
@@ -125,6 +125,13 @@ public class TestScreen extends FragmentActivity implements OnClickListener {
 		initializeViews();
 		done.setOnClickListener(this);
 		db = new DBHandler(this);
+		int count=db.getQuestionsCount();
+		Log.i("ques= "+count,"abc");
+		//db.deleteDB();
+		if(count==10)
+			{db.deleteDB();
+			Log.i("data deleted","abc");
+			}
 		/*try {*/
 			/*Bundle getBundle = getIntent().getExtras();
 			String res = getBundle.getString("res");
